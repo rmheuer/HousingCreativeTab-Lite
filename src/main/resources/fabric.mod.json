@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "housingcreativetab",
+  "version": "${version}",
+  "name": "HousingCreativeTab",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/housingcreativetab/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "xyz.busterbrown1218.housingcreativetab.client.HousingCreativeTabClient"
+    ],
+    "main": [
+      "xyz.busterbrown1218.housingcreativetab.HousingCreativeTab"
+    ]
+  },
+  "mixins": [
+    "housingcreativetab.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

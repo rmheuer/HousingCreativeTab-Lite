@@ -1,0 +1,30 @@
+{
+  "oak_wood": {
+    "identifier": "oak_log",
+    "data_value": 12
+  },
+  "spruce_wood": {
+    "identifier": "spruce_log",
+    "data_value": 13
+  },
+  "birch_wood": {
+    "identifier": "birch_log",
+    "data_value": 14
+  },
+  "jungle_wood": {
+    "identifier": "jungle_log",
+    "data_value": 15
+  },
+  "acacia_wood": {
+    "identifier": "acacia_log",
+    "data_value": 12
+  },
+  "dark_oak_wood": {
+    "identifier": "dark_oak_log",
+    "data_value": 13
+  },
+  "smooth_stone": {
+    "identifier": "smooth_stone_slab",
+    "data_value": 8
+  }
+}
