@@ -151,6 +151,12 @@ public class ItemCommands {
 
                                         item.set(DataComponentTypes.TRIM, new ArmorTrim(materialEntry, patternEntry));
                                     }))))));
+
+            dispatcher.register(literal("count")
+                    .then(argument("amount", IntegerArgumentType.integer(1, 64))
+                            .executes(itemCommand((context, item) -> {
+                                item.setCount(IntegerArgumentType.getInteger(context, "amount"));
+                            }))));
         });
     }
 
