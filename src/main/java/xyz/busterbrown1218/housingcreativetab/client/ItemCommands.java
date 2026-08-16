@@ -24,6 +24,10 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import xyz.busterbrown1218.housingcreativetab.utils.ClientIdentifierArgumentType;
+import xyz.busterbrown1218.housingcreativetab.utils.ItemSuggestionProvider;
+import xyz.busterbrown1218.housingcreativetab.utils.TrimMaterialSuggestionProvider;
+import xyz.busterbrown1218.housingcreativetab.utils.TrimSuggestionProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +45,10 @@ public class ItemCommands {
                             }))));
 
             dispatcher.register(literal("itemmodel")
-                    .then(argument("id", StringArgumentType.greedyString())
+                    .then(argument("id", ClientIdentifierArgumentType.identifier())
+                            .suggests(new ItemSuggestionProvider())
                             .executes(itemCommand(((context, item) -> {
-                                item.set(DataComponentTypes.ITEM_MODEL, Identifier.of(StringArgumentType.getString(context, "id")));
+                                item.set(DataComponentTypes.ITEM_MODEL, ClientIdentifierArgumentType.getIdentifier(context, "id"));
                             })))));
 
             dispatcher.register(literal("damage")
@@ -108,7 +113,8 @@ public class ItemCommands {
             );
 
             dispatcher.register(literal("itemtype")
-                    .then(argument("id", StringArgumentType.greedyString())
+                    .then(argument("id", ClientIdentifierArgumentType.identifier())
+                            .suggests(new ItemSuggestionProvider())
                             .executes(context -> {
                                 MinecraftClient client = MinecraftClient.getInstance();
                                 PlayerEntity player = client.player;
@@ -117,7 +123,7 @@ public class ItemCommands {
 
                                 ItemStack item = player.getStackInHand(player.getActiveHand());
 
-                                setItem(client, player, item.withItem(new ItemStack(Registries.ITEM.get(Identifier.of(StringArgumentType.getString(context, "id")))).getItem()));
+                                setItem(client, player, item.withItem(new ItemStack(Registries.ITEM.get(ClientIdentifierArgumentType.getIdentifier(context, "id"))).getItem()));
 
                                 return Command.SINGLE_SUCCESS;
                             })));
@@ -135,11 +141,13 @@ public class ItemCommands {
                             })))));
 
             dispatcher.register(literal("armortrim")
-                    .then(argument("template", StringArgumentType.string())
-                            .then(argument("material", StringArgumentType.string())
+                    .then(argument("template", ClientIdentifierArgumentType.identifier())
+                            .suggests(new TrimSuggestionProvider())
+                            .then(argument("material", ClientIdentifierArgumentType.identifier())
+                                    .suggests(new TrimMaterialSuggestionProvider())
                                     .executes(itemCommand(((context, item) -> {
-                                        Identifier templateId = Identifier.of(StringArgumentType.getString(context, "template"));
-                                        Identifier materialId = Identifier.of(StringArgumentType.getString(context, "material"));
+                                        Identifier templateId = ClientIdentifierArgumentType.getIdentifier(context, "template");
+                                        Identifier materialId = ClientIdentifierArgumentType.getIdentifier(context, "material");
 
                                         Registry<ArmorTrimPattern> patternRegistry = context.getSource().getWorld().getRegistryManager().getOrThrow(RegistryKeys.TRIM_PATTERN);
                                         Registry<ArmorTrimMaterial> materialRegistry = context.getSource().getWorld().getRegistryManager().getOrThrow(RegistryKeys.TRIM_MATERIAL);
