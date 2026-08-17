@@ -26,5 +26,33 @@
   "smooth_stone": {
     "identifier": "smooth_stone_slab",
     "data_value": 8
+  },
+  "smooth_sandstone": {
+    "identifier": "sandstone_slab",
+    "data_value": 9
+  },
+  "smooth_quartz": {
+    "identifier": "quartz_slab",
+    "data_value": 15
+  },
+  "smooth_red_sandstone": {
+    "identifier": "red_sandstone_slab",
+    "data_value": 8
+  },
+  "white_dye": {
+    "identifier": "bone_meal",
+    "data_value": -1
+  },
+  "black_dye": {
+    "identifier": "ink_sac",
+    "data_value": -1
+  },
+  "brown_dye": {
+    "identifier": "cocoa_beans",
+    "data_value": -1
+  },
+  "blue_dye": {
+    "identifier": "lapis_lazuli",
+    "data_value": -1
   }
 }

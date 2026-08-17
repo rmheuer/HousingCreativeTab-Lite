@@ -74,7 +74,7 @@ public abstract class CreativeInventoryMixin {
                 Pair<Identifier, Integer> data = DATA_VALUES.get(id);
 
                 ItemStack updatedItem = item.withItem(new ItemStack(Registries.ITEM.get(data.getLeft())).getItem());
-                updatedItem.set(DataComponentTypes.LORE, new LoreComponent(List.of(Text.of("§7Data Value: " + data.getRight()))));
+                if (data.getRight() != -1) updatedItem.set(DataComponentTypes.LORE, new LoreComponent(List.of(Text.of("§7Data Value: " + data.getRight()))));
                 updatedItem.set(DataComponentTypes.ITEM_MODEL, id);
 
                 updatedItems.add(updatedItem);
