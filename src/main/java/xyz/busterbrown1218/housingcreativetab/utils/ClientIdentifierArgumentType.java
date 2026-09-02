@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class ClientIdentifierArgumentType implements ArgumentType<Identifier> {
     public ClientIdentifierArgumentType() {}
@@ -15,7 +15,7 @@ public class ClientIdentifierArgumentType implements ArgumentType<Identifier> {
 
     @Override
     public Identifier parse(StringReader reader) throws CommandSyntaxException {
-        return Identifier.fromCommandInput(reader);
+        return Identifier.read(reader);
     }
 
     public static Identifier getIdentifier(final CommandContext<?> context, final String name) {

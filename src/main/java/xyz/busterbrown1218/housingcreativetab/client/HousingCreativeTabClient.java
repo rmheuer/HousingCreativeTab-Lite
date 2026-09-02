@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import xyz.busterbrown1218.housingcreativetab.HousingCreativeTab;
 
 import java.io.InputStreamReader;
@@ -34,10 +34,10 @@ public class HousingCreativeTabClient implements ClientModInitializer {
 
     public void loadItems(JsonArray jsonArray) {
         for (JsonElement element : jsonArray) {
-            Identifier id = Identifier.of(element.getAsString());
+            Identifier id = Identifier.parse(element.getAsString());
 
-            if (Registries.ITEM.containsId(id)) {
-                ALLOWED_1_8_9_ITEMS.add(Registries.ITEM.get(id));
+            if (BuiltInRegistries.ITEM.containsKey(id)) {
+                ALLOWED_1_8_9_ITEMS.add(BuiltInRegistries.ITEM.getValue(id));
             }
         }
     }
@@ -45,7 +45,7 @@ public class HousingCreativeTabClient implements ClientModInitializer {
     public void loadDataValues(JsonObject jsonObject) {
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             JsonObject value = (JsonObject) entry.getValue();
-            DATA_VALUES.put(Identifier.of(entry.getKey()), new Pair<>(Identifier.of(value.get("identifier").getAsString()), value.get("data_value").getAsInt()));
+            DATA_VALUES.put(Identifier.parse(entry.getKey()), new Pair<>(Identifier.parse(value.get("identifier").getAsString()), value.get("data_value").getAsInt()));
         }
     }
 }

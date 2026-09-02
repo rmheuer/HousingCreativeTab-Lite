@@ -1,48 +1,62 @@
 plugins {
-    id 'fabric-loom' version '1.17-SNAPSHOT'
-    id 'maven-publish'
+    id("dev.kikugie.loom-back-compat")
 }
 
-version = project.mod_version
-group = project.maven_group
+version = "${property("mod.version")}+${stonecutter.current.version}"
+base.archivesName = property("mod.id") as String
 
-base {
-    archivesName = project.archives_base_name
+JavaVersion requiredJava
+int javaVersion
+if (stonecutter.current.parsed >= "26.1") {
+    requiredJava = JavaVersion.VERSION_25
+    javaVersion = 25
+} else {
+    requiredJava = JavaVersion.VERSION_21
+    javaVersion = 21
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    minecraft "com.mojang:minecraft:${stonecutter.current.version}"
+    modImplementation "net.fabricmc:fabric-loader:${property("deps.fabric_loader")}"
+    loomx.applyMojangMappings()
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}"
 }
 
 processResources {
-    inputs.property "version", project.version
-    inputs.property "minecraft_version", project.minecraft_version
-    inputs.property "loader_version", project.loader_version
+    inputs.property "version", project.property("mod.version")
+    inputs.property "minecraft_version", stonecutter.current.version
+    inputs.property "loader_version", project.property("deps.fabric_loader")
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version,
-                "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version
+        expand "version": project.property("mod.version"),
+                "minecraft_version": stonecutter.current.version,
+                "loader_version": project.property("deps.fabric_loader")
     }
 }
 
-def targetJavaVersion = 21
+tasks.register("buildAndCollect", Copy) {
+    group = "build"
+    description = "Builds mod jars and copies results to `build/libs/${project.property("mod.version")}/`"
+
+    inputs.property("version", project.property("mod.version"))
+    // loomx.mod(Sources)Jar returns the jar task for the applied loom variant
+    from(loomx.modJar.flatMap { it.archiveFile }, loomx.modSourcesJar.flatMap { it.archiveFile })
+    into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+}
+
+
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        it.options.release.set(targetJavaVersion)
+    if (javaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release.set(javaVersion)
     }
 }
 
 java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    if (JavaVersion.current() < requiredJava) {
+        toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
     }
     withSourcesJar()
 }
@@ -50,14 +64,5 @@ java {
 jar {
     from("LICENSE") {
         rename { "${it}_${project.archives_base_name}" }
-    }
-}
-
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = project.archives_base_name
-            from components.java
-        }
     }
 }
