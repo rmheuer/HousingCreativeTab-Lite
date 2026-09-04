@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "housingcreativetab",
+  "id": "housingcreativetab-lite",
   "version": "${version}",
-  "name": "HousingCreativeTab",
+  "name": "HousingCreativeTab-lite",
   "description": "",
   "authors": [],
   "contact": {},
@@ -11,10 +11,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "xyz.busterbrown1218.housingcreativetab.client.HousingCreativeTabClient"
-    ],
-    "main": [
-      "xyz.busterbrown1218.housingcreativetab.HousingCreativeTab"
+      "xyz.busterbrown1218.housingcreativetab.HousingCreativeTabClient"
     ]
   },
   "mixins": [
@@ -24,5 +21,8 @@
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
     "minecraft": "${minecraft_version}"
+  },
+  "breaks": {
+    "housingcreativetab": "*"
   }
 }

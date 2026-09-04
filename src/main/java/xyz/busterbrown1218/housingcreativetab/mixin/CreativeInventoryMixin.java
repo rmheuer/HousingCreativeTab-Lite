@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,13 +21,14 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xyz.busterbrown1218.housingcreativetab.client.HousingCreativeTabClient;
+import xyz.busterbrown1218.housingcreativetab.HousingCreativeTabClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
-import static xyz.busterbrown1218.housingcreativetab.client.HousingCreativeTabClient.*;
+import static xyz.busterbrown1218.housingcreativetab.HousingCreativeTabClient.*;
 
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeInventoryMixin {
@@ -34,7 +36,7 @@ public abstract class CreativeInventoryMixin {
     private static CreativeModeTab selectedTab;
 
     @Shadow
-    protected abstract void selectTab(CreativeModeTab group);
+    protected abstract void selectTab(CreativeModeTab tab);
     @Shadow
     protected abstract void refreshSearchResults();
 
@@ -44,22 +46,28 @@ public abstract class CreativeInventoryMixin {
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;addWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"))
     private void init(CallbackInfo ci) {
         if (!hasSetHideItems) {
-            hideItems = Minecraft.getInstance().level.getScoreboard().getObjectiveNames().contains("housing");
+            ClientLevel level = Objects.requireNonNull(Minecraft.getInstance().level);
+            hideItems = level.getScoreboard().getObjectiveNames().contains("housing");
             hasSetHideItems = true;
         }
 
-        ScreenAccessor accessor = (ScreenAccessor) (Object) this;
+        ScreenAccessor accessor = (ScreenAccessor) this;
+        int screenWidth = accessor.housingcreativetab$getScreenWidth();
+        int screenHeight = accessor.housingcreativetab$getScreenHeight();
 
         toggleButton = new Button.Builder(Component.literal("Housing Items: " + (hideItems ? "Enabled" : "Disabled")), (widget) -> {
             hideItems = !hideItems;
             toggleButton.setMessage(Component.literal("Housing Items: " + (hideItems ? "Enabled" : "Disabled")));
 
-            if (selectedTab.getType() == CreativeModeTab.Type.SEARCH)selectTab(selectedTab);
-            else refreshSearchResults();
+            if (selectedTab.getType() == CreativeModeTab.Type.SEARCH) {
+                selectTab(selectedTab);
+            } else {
+                refreshSearchResults();
+            }
         }).build();
-        toggleButton.setPosition(accessor.getScreenWidth() / 2 - toggleButton.getWidth() / 2, accessor.getScreenHeight() - toggleButton.getHeight() - 1);
+        toggleButton.setPosition(screenWidth / 2 - toggleButton.getWidth() / 2, screenHeight - toggleButton.getHeight() - 1);
         toggleButton.visible = true;
-        accessor.addDrawableChildInvoker(toggleButton);
+        accessor.housingcreativetab$addDrawableChildInvoker(toggleButton);
     }
 
     @WrapOperation(method = "selectTab", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;getDisplayItems()Ljava/util/Collection;"))
@@ -94,7 +102,7 @@ public abstract class CreativeInventoryMixin {
     }
 
     @WrapOperation(method = "refreshSearchResults", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;addAll(Ljava/util/Collection;)Z"))
-    private boolean filterSearchItems(NonNullList instance, Collection<ItemStack> items, Operation<Boolean> original) {
+    private boolean filterSearchItems(NonNullList<ItemStack> instance, Collection<ItemStack> items, Operation<Boolean> original) {
         if (!hideItems) return original.call(instance, items);
         Collection<ItemStack> operableItems = new ArrayList<>(items);
         operableItems.removeIf(this::shouldHide);

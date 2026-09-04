@@ -11,11 +11,12 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(Screen.class)
 public interface ScreenAccessor {
     @Accessor("width")
-    int getScreenWidth();
+    int housingcreativetab$getScreenWidth();
 
     @Accessor("height")
-    int getScreenHeight();
+    int housingcreativetab$getScreenHeight();
 
+    @SuppressWarnings("UnusedReturnValue")
     @Invoker("addRenderableWidget")
-    <T extends GuiEventListener & Renderable & NarratableEntry> T addDrawableChildInvoker(T child);
+    <T extends GuiEventListener & Renderable & NarratableEntry> T housingcreativetab$addDrawableChildInvoker(T child);
 }
