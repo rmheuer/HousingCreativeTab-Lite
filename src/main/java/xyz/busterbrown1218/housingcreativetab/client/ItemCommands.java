@@ -37,6 +37,8 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 *///?}
 public class ItemCommands {
+    private static List<Component> loreClipboard;
+
     public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, unused) -> {
             dispatcher.register(literal("rename")
@@ -134,7 +136,6 @@ public class ItemCommands {
                                 String value = StringArgumentType.getString(context, "hex");
                                 if (!value.matches("[a-fA-F0-9]{6}")) {
                                     Compat.sendPlayerMessage(context.getSource().getPlayer(), Component.literal("Invalid hex format! Digits must be (0-9, a-f). §8Example: §fFFFFFF"));
-//                                    context.getSource().getPlayer().sendSystemMessage(Component.literal("Invalid hex format! Digits must be (0-9, a-f). §8Example: §fFFFFFF"));
                                     return item;
                                 }
                                 int color = Integer.parseInt(value, 16);
@@ -170,24 +171,26 @@ public class ItemCommands {
                                 return item;
                             }))));
 
-            dispatcher.register(literal("stuff")
+            dispatcher.register(literal("copyLore")
                     .executes(itemCommand((context, item) -> {
-                        item.getComponents().iterator().forEachRemaining(action -> {
-                            System.out.println(action.value().toString());
-                        });
+                        loreClipboard = new ArrayList<>(item.get(DataComponents.LORE).lines());
                         return item;
                     })));
+
+            dispatcher.register(literal("pasteLore")
+                    .executes(itemCommand(((context, item) -> {
+                        item.set(DataComponents.LORE, new ItemLore(loreClipboard));
+                        return item;
+                    }))));
         });
     }
 
     private static boolean cannotEdit(@UnknownNullability Player player) {
         if (!player.isCreative()) {
             Compat.sendPlayerMessage(player, Component.literal("You must be in creative to edit an item!"));
-//            player.sendSystemMessage(Component.literal("You must be in creative to edit an item!"));
             return true;
         } else if (player.getActiveItem().isEmpty()) {
             Compat.sendPlayerMessage(player, Component.literal("You must be holding an item to edit!"));
-//            player.sendSystemMessage(Component.literal("You must be holding an item to edit!"));
             return true;
         }
         return false;
