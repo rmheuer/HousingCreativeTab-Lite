@@ -1,5 +1,5 @@
 ## Housing Creative Tab Lite
-Fork of [HousingCreativeTab](https://github.com/BusterBrown1218/HousingCreativeTab) that only
+Unofficial fork of [HousingCreativeTab](https://github.com/BusterBrown1218/HousingCreativeTab) that only
 includes the creative menu features. All credit for the original mod goes to
 [BusterBrown1218](https://github.com/BusterBrown1218).
 
